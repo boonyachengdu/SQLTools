@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Build-Jdk: 1.7.0_80
+Built-By: louyi
+Created-By: Maven Integration for Eclipse
+Class-Path: lib/mysql-connector-java-5.1.38.jar 
+Main-Class: com.boonya.mycat.JdbcMainTest 
+

@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!DOCTYPE mycat:schema SYSTEM "schema.dtd">
+<mycat:schema xmlns:mycat="http://org.opencloudb/">
+	<schema name="TESTDB" checkSQLschema="false" sqlMaxLimit="100">
+		<!-- auto sharding by id (long) -->
+		<table name="travelrecord" dataNode="dn1,dn2,dn3" rule="auto-sharding-long" />
+		<!-- global table is auto cloned to all defined data nodes ,so can join 
+			with any table whose sharding node is in the same data node -->
+		<table name="company" primaryKey="ID" type="global" dataNode="dn1,dn2,dn3" />
+		<table name="goods" primaryKey="ID" type="global" dataNode="dn1,dn2" />
+		<!-- random sharding using mod sharind rule -->
+		<table name="hotnews" primaryKey="ID" dataNode="dn1,dn2,dn3"
+			rule="mod-long" />
+		<table name="employee" primaryKey="ID" dataNode="dn1,dn2"
+			rule="sharding-by-intfile" />
+		<table name="customer" primaryKey="ID" dataNode="dn1,dn2"
+			rule="sharding-by-intfile">
+			<childTable name="orders" primaryKey="ID" joinKey="customer_id"
+				parentKey="id">
+			</childTable>
+		</table>
+		<table name="mycat_sequence" dataNode="dn1" />
+	</schema>
+	<dataNode name="dn1" dataHost="localhost1" database="db1" />
+	<dataNode name="dn2" dataHost="localhost1" database="db2" />
+	<dataNode name="dn3" dataHost="localhost1" database="db3" />
+	<dataHost name="localhost1" maxCon="1000" minCon="10" balance="3"
+		writeType="0" dbType="mysql" dbDriver="native" switchType="1"
+		slaveThreshold="100">
+		<heartbeat>select user()</heartbeat>
+		<!-- can have multi write hosts -->
+		<writeHost host="hostM1" url="ip1:3306" user="root"
+			password="123456">
+			<!-- can have multi read hosts -->
+			<readHost host="hostS1" url="ip2:3306" user="root" password="123456"
+				weight="1" />
+		</writeHost>
+	</dataHost>
+</mycat:schema>
