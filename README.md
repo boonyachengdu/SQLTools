@@ -2,6 +2,7 @@
 SQLTools 专门用于测试数据库性能的小工具。
 
 # 性能测试示例
+<pre>
 3.1.1.多线程插入性能测试
 ==============================================JDBC测试10.10.11.218=================
 java -jar SQLTEST.jar 参数说明
@@ -177,4 +178,4 @@ SELECT * FROM mycat_hsae_db.t_location t LEFT JOIN data_number.t_vehicle v ON t.
 **********************************======java -jar SQLTEST.jar 1 queryandinsert 100000  unlimit
 线程2执行完成，耗时：37585ms,约38s
 
-
+</pre>
