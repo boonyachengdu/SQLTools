@@ -3,8 +3,8 @@ package com.boonya.mycat;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import com.boonya.jdbc.JDBCUtil;
+import com.boonya.utils.UUIDUtil;
 import com.mysql.jdbc.Connection;
 import com.mysql.jdbc.PreparedStatement;
 /**
@@ -30,6 +30,7 @@ public class JdbcMainTest {
 		return res.getLong(1);
 	}
 	
+	
 	/**
 	 * 插入或查询
 	 * 
@@ -46,8 +47,8 @@ public class JdbcMainTest {
 				pstm = (PreparedStatement) conn.prepareStatement(sql);
 				pstm.executeUpdate();
 				long end=System.currentTimeMillis();
-				System.out.println("线程"+threadId+"执行完成，耗时："+(end-start)+"ms,约"+(end-start)/1000+"s"); 
 				count++;
+				System.out.println(count+"==线程"+threadId+"执行完成，耗时："+(end-start)+"ms,约"+(end-start)/1000+"s"); 
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -57,28 +58,26 @@ public class JdbcMainTest {
 				pstm = (PreparedStatement) conn.prepareStatement(querySql);
 				pstm.executeQuery();
 				long end=System.currentTimeMillis();
-				System.out.println("线程"+threadId+"执行完成，耗时："+(end-start)+"ms,约"+(end-start)/1000+"s"); 
 				count++;
+				System.out.println(count+"==线程"+threadId+"执行完成，耗时："+(end-start)+"ms,约"+(end-start)/1000+"s"); 
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}else if(type.equals("insertquery")||type.equals("queryinsert")){
 			long start=System.currentTimeMillis();
 			try {
+				// 写入
 				pstm = (PreparedStatement) conn.prepareStatement(sql);
 				pstm.executeUpdate();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-			try {
+				// 读取
 				pstm = (PreparedStatement) conn.prepareStatement(querySql);
 				pstm.executeQuery();
+				count++;
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 			long end=System.currentTimeMillis();
-			count++;
-			System.out.println("线程"+threadId+"执行读写完成，耗时："+(end-start)+"ms,约"+(end-start)/1000+"s"); 
+			System.out.println(count+"==线程"+threadId+"执行读写完成，耗时："+(end-start)+"ms,约"+(end-start)/1000+"s"); 
 		}
 		
 	}
@@ -89,7 +88,7 @@ public class JdbcMainTest {
 	 * @param count
 	 * @return
 	 */
-	public String getSql(long max,int count){
+	public String getSql(int count){
 		StringBuffer sql = new StringBuffer();
 		// F_ID为自增字段，mycat使用需要配置table的autoIncrement属性为true
 		sql.append("INSERT INTO t_location (F_ID,F_VEHICLE_ID,F_LATITUDE,F_LONGITUDE,F_HIGH,F_SPEED,"
@@ -100,9 +99,9 @@ public class JdbcMainTest {
 		+"F_ALARM_DATA1,F_AREASN,F_GEO) VALUES");
 		for (int i = 1; i <=count; i++) {
 			if(i==count){
-				sql.append("('"+(i+max)+"','4664901388982278', '0', '0', '0', '0', '0', '0', '0', '0', '1711081', '0', '2017-05-07 00:34:41', '2017-05-06 16:34:35', '1', '0', '4664901388993337', '41082302', '0', '1', '0', '0', '', '');");
+				sql.append("('"+UUIDUtil.createUUID()+"','4664901388982278', '0', '0', '0', '0', '0', '0', '0', '0', '1711081', '0', '2017-05-07 00:34:41', '2017-05-06 16:34:35', '1', '0', '4664901388993337', '41082302', '0', '1', '0', '0', '', '');");
 			}else{
-				sql.append("('"+(i+max)+"','4664901388982278', '0', '0', '0', '0', '0', '0', '0', '0', '1711081', '0', '2017-05-07 00:34:41', '2017-05-06 16:34:35', '1', '0', '4664901388993337', '41082302', '0', '1', '0', '0', '', ''),");
+				sql.append("('"+UUIDUtil.createUUID()+"','4664901388982278', '0', '0', '0', '0', '0', '0', '0', '0', '1711081', '0', '2017-05-07 00:34:41', '2017-05-06 16:34:35', '1', '0', '4664901388993337', '41082302', '0', '1', '0', '0', '', ''),");
 			}
 		}
 		//System.out.println("SQL:"+sql.toString());
@@ -119,11 +118,11 @@ public class JdbcMainTest {
 	public static void main(String[] args) throws ClassNotFoundException, SQLException {
 		JdbcMainTest st=new JdbcMainTest();
 		
-	/*	args=new String[4];
-		args[0]="1";
-		args[1]="insertandquery";
-		args[2]="15000";
-		args[3]="unlimit";*/
+	    args=new String[4];
+		args[0]="10";
+		args[1]="insert";
+		args[2]="10000";
+		args[3]="unlimit";
 		
         Connection conn=JDBCUtil.getConnection("innodb");
 		
@@ -184,11 +183,7 @@ public class JdbcMainTest {
 			if(limit==0){
 				limit=1;
 			}
-			if(threadNum==1){
-				sql=new String(st.getSql(maxId,limit));
-			}else{
-				sql=new String(new MycatMainTest().getSql(conn,limit));
-			}
+			sql=new String(st.getSql(limit));
 			
 		}else  if("insertandquery".equals(args[1])||"queryandinsert".equals(args[1])){
 			// 既写又读
@@ -211,11 +206,7 @@ public class JdbcMainTest {
 			if(limit==0){
 				limit=1;
 			}
-			if(threadNum==1){
-				sql=new String(st.getSql(maxId,limit));
-			}else{
-				sql=new String(new MycatMainTest().getSql(conn,limit));
-			}
+			sql=new String(st.getSql(limit));
 		
 		}else{
 			System.out.println("args[1] 参数请输入：query|insert|queryandinsert|insertandquery");
@@ -225,7 +216,7 @@ public class JdbcMainTest {
 		long start=System.currentTimeMillis();
 		
 		for (int i = 1; i <= threadNum; i++) {
-			new Thread(new SHThread(i, conn, sql,querySql,type)).start();
+			new Thread(new JdbcSHThread(i, conn, sql,querySql,type)).start();
 		}
 		// 运行线程
 		boolean run=true;

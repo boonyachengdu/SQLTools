@@ -3,8 +3,9 @@ package com.boonya.mycat;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.UUID;
+
 import com.boonya.jdbc.MycatJdbc;
-import com.boonya.utils.Pk;
 import com.mysql.jdbc.Connection;
 import com.mysql.jdbc.PreparedStatement;
 /**
@@ -46,8 +47,8 @@ public class MycatMainTest {
 				pstm = (PreparedStatement) conn.prepareStatement(sql);
 				pstm.executeUpdate();
 				long end=System.currentTimeMillis();
-				System.out.println("线程"+threadId+"执行完成，耗时："+(end-start)+"ms,约"+(end-start)/1000+"s"); 
 				count++;
+				System.out.println("线程"+threadId+"执行完成，耗时："+(end-start)+"ms,约"+(end-start)/1000+"s"); 
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -57,27 +58,25 @@ public class MycatMainTest {
 				pstm = (PreparedStatement) conn.prepareStatement(querySql);
 				pstm.executeQuery();
 				long end=System.currentTimeMillis();
-				System.out.println("线程"+threadId+"执行完成，耗时："+(end-start)+"ms,约"+(end-start)/1000+"s"); 
 				count++;
+				System.out.println("线程"+threadId+"执行完成，耗时："+(end-start)+"ms,约"+(end-start)/1000+"s"); 
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}else if(type.equals("queryandinsert")||type.equals("insertandquery")){
 			long start=System.currentTimeMillis();
 			try {
+				// 写入
 				pstm = (PreparedStatement) conn.prepareStatement(sql);
 				pstm.executeUpdate();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-			try {
+				// 读取
 				pstm = (PreparedStatement) conn.prepareStatement(querySql);
 				pstm.executeQuery();
+				count++;
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 			long end=System.currentTimeMillis();
-			count++;
 			System.out.println("线程"+threadId+"执行读写完成，耗时："+(end-start)+"ms,约"+(end-start)/1000+"s"); 
 		}
 		
@@ -97,28 +96,11 @@ public class MycatMainTest {
 		+"F_ACC_STATUS,F_IS_REAL_LOCATION,F_TERMINAL_ID,"
 		+"F_ENTERPRISE_CODE,F_GPSENCRYPT,F_GPSSTATE,F_ISPASSUP,"
 		+"F_ALARM_DATA1,F_AREASN,F_GEO) VALUES");
-		long start=0;
-		try {
-			start=getMycatLastInsertId(conn)/*new Random().nextLong()*/;
-			System.out.println("lastId="+start);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		if(start==0){
-			for (int i = 1; i <=count; i++) {
-				if(i==count){
-					sql.append("('"+Pk.getPK()+"','4664901388982278', '0', '0', '0', '0', '0', '0', '0', '0', '1711081', '0', '2017-05-07 00:34:41', '2017-05-06 16:34:35', '1', '0', '4664901388993337', '41082302', '0', '1', '0', '0', '', '');");
-				}else{
-					sql.append("('"+Pk.getPK()+"','4664901388982278', '0', '0', '0', '0', '0', '0', '0', '0', '1711081', '0', '2017-05-07 00:34:41', '2017-05-06 16:34:35', '1', '0', '4664901388993337', '41082302', '0', '1', '0', '0', '', ''),");
-				}
-			}
-		}else{
-			for (int i = 1; i <=count; i++) {
-				if(i==count){
-					sql.append("('"+(start+i)+"','4664901388982278', '0', '0', '0', '0', '0', '0', '0', '0', '1711081', '0', '2017-05-07 00:34:41', '2017-05-06 16:34:35', '1', '0', '4664901388993337', '41082302', '0', '1', '0', '0', '', '');");
-				}else{
-					sql.append("('"+(start+i)+"','4664901388982278', '0', '0', '0', '0', '0', '0', '0', '0', '1711081', '0', '2017-05-07 00:34:41', '2017-05-06 16:34:35', '1', '0', '4664901388993337', '41082302', '0', '1', '0', '0', '', ''),");
-				}
+		for (int i = 1; i <=count; i++) {
+			if(i==count){
+				sql.append("('"+UUID.randomUUID().toString()+"','4664901388982278', '0', '0', '0', '0', '0', '0', '0', '0', '1711081', '0', '2017-05-07 00:34:41', '2017-05-06 16:34:35', '1', '0', '4664901388993337', '41082302', '0', '1', '0', '0', '', '');");
+			}else{
+				sql.append("('"+UUID.randomUUID().toString()+"','4664901388982278', '0', '0', '0', '0', '0', '0', '0', '0', '1711081', '0', '2017-05-07 00:34:41', '2017-05-06 16:34:35', '1', '0', '4664901388993337', '41082302', '0', '1', '0', '0', '', ''),");
 			}
 		}
 		//System.out.println("SQL:"+sql.toString());
@@ -135,11 +117,11 @@ public class MycatMainTest {
 	public static void main(String[] args) throws ClassNotFoundException, SQLException {
 		MycatMainTest st=new MycatMainTest();
 		
-		/*args=new String[4];
+		args=new String[4];
 		args[0]="1";
 		args[1]="insert";
-		args[2]="20000";
-		args[3]="limit";*/
+		args[2]="2000";
+		args[3]="unlimit";
 		
         Connection conn=MycatJdbc.getConnection();
 		
@@ -149,9 +131,6 @@ public class MycatMainTest {
 		if(!isConnected){
 			return ;
 		}
-		
-		long maxId=st.getMycatLastInsertId(conn)/*new Random().nextLong()*/;
-		System.out.println("当前最大ID="+maxId);
 		
 		int threadNum=0;
 		try {

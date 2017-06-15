@@ -8,11 +8,11 @@ public class MycatJdbc {
 	
     private static String driver = "com.mysql.jdbc.Driver";
 	
-	private static String url = "jdbc:mysql://10.10.10.117:8066/TESTDB?autoReconnect=true&maxReconnects=10&failOverReadOnly=false&useUnicode=true&characterEncoding=utf-8&rewriteBatchedStatements=true";
+	private static String url = "jdbc:mysql://10.10.11.122:8066/TESTDB?autoReconnect=true&maxReconnects=10&failOverReadOnly=false&useUnicode=true&characterEncoding=utf-8&rewriteBatchedStatements=true";
 	
 	private static String user = "root";
 
-	private static String password = "root";
+	private static String password = "123456";
 	
 	static Connection conn = null;
 
