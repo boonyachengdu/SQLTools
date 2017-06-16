@@ -7,7 +7,7 @@ import com.boonya.factory.JdbcConnectionFactory;
 import com.boonya.utils.PropertiesReader;
 import com.mysql.jdbc.Connection;
 /**
- * JDBC连接类型工厂实现类
+ * JDBC连接工厂实现类
  * 
  * @author pengjunlin
  *
@@ -40,6 +40,11 @@ public class JdbcConnectionFactoryImpl implements JdbcConnectionFactory {
 		}
 	}
 	
+	/**
+	 * 重新设置JDBC参数
+	 * 
+	 * @param dbtype
+	 */
 	private void resetParams(String dbtype){
 		type=dbtype;
 		url=PropertiesReader.getValueByKey(jdbcProperties, "jdbc."+type+".url");
@@ -51,6 +56,9 @@ public class JdbcConnectionFactoryImpl implements JdbcConnectionFactory {
 		System.out.println("password="+password);
 	}
 
+	/**
+	 * 获取工厂连接
+	 */
 	public Connection getConnection(String type) throws ClassNotFoundException, SQLException {
 		resetParams(type);
 		conn = (Connection) DriverManager.getConnection(url, user, password);
