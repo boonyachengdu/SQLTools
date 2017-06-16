@@ -10,12 +10,12 @@ import com.mysql.jdbc.Connection;
 public class PerformanceMain {
 
 	public static void main(String[] args) throws SQLException {
-		/*args = new String[5];
-		args[0] = "10";
+		args = new String[5];
+		args[0] = "15";
 		args[1] = "insertandquery";
-		args[2] = "2000";
+		args[2] = "6666";
 		args[3] = "unlimit";
-		args[4] = "localhost";*/
+		args[4] = "mycat117";
 
 		if (args == null || args.length != 5) {
 			System.out
