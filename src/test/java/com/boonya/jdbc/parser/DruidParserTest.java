@@ -8,7 +8,6 @@ import com.alibaba.druid.sql.parser.SQLStatementParser;
 
 public class DruidParserTest {
 	
-	
 	/**
 	 * 一开始需要初始化一个 Parser，在这里 SQLStatementParser 是一个父类，真正解析 SQL 语句的 Parser 实现是 MySqlStatementParser。Parser 的解析结果是一个 SQLStatement，这是一个内部维护了树状逻辑结构的类。
 	 */
